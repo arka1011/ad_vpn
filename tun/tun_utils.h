@@ -1,0 +1,20 @@
+#ifndef TUN_UTILS_H
+#define TUN_UTILS_H
+
+#include <stddef.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int tun_create(char *ifname, size_t ifname_len);
+int if_set_flags(const char *ifname, short flags_mask, int set);
+int if_set_mtu(const char *ifname, int mtu);
+int if_set_addr_netmask(const char *ifname, const char *ip_str, const char *mask_str);
+void cidr_to_addr_mask(const char *cidr, char *ip_out, size_t ip_out_len, char *mask_out, size_t mask_out_len);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // TUN_UTILS_H

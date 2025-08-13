@@ -5,7 +5,7 @@
 //          This creates a TUN interface, assigns IPv4, netmask, MTU, and brings it UP.
 //          Then it prints any IP packets received from the kernel (via the TUN fd).
 
-#define _GNU_SOURCE
+#include "tun_utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -21,7 +21,7 @@
 #include <linux/if_tun.h>
 #include "../logger/logger.h"
 
-static int tun_create(char *ifname, size_t ifname_len) {
+int tun_create(char *ifname, size_t ifname_len) {
     struct ifreq ifr;
     int fd = open("/dev/net/tun", O_RDWR);
     if (fd < 0) {
@@ -54,7 +54,7 @@ static int tun_create(char *ifname, size_t ifname_len) {
     return fd;
 }
 
-static int if_set_flags(const char *ifname, short flags_mask, int set) {
+int if_set_flags(const char *ifname, short flags_mask, int set) {
     int s = socket(AF_INET, SOCK_DGRAM, 0);
     if (s < 0) { LOG_ERROR("socket: %s", strerror(errno)); return -1; }
 
@@ -70,7 +70,7 @@ static int if_set_flags(const char *ifname, short flags_mask, int set) {
     close(s); return 0;
 }
 
-static int if_set_mtu(const char *ifname, int mtu) {
+int if_set_mtu(const char *ifname, int mtu) {
     int s = socket(AF_INET, SOCK_DGRAM, 0);
     if (s < 0) { LOG_ERROR("socket: %s", strerror(errno)); return -1; }
     struct ifreq ifr; memset(&ifr, 0, sizeof(ifr));
@@ -82,7 +82,7 @@ static int if_set_mtu(const char *ifname, int mtu) {
     close(s); return 0;
 }
 
-static int if_set_addr_netmask(const char *ifname, const char *ip_str, const char *mask_str) {
+int if_set_addr_netmask(const char *ifname, const char *ip_str, const char *mask_str) {
     int s = socket(AF_INET, SOCK_DGRAM, 0);
     if (s < 0) { LOG_ERROR("socket: %s", strerror(errno)); return -1; }
 
@@ -115,7 +115,7 @@ static int if_set_addr_netmask(const char *ifname, const char *ip_str, const cha
     close(s); return 0;
 }
 
-static void cidr_to_addr_mask(const char *cidr, char *ip_out, size_t ip_out_len, char *mask_out, size_t mask_out_len) {
+void cidr_to_addr_mask(const char *cidr, char *ip_out, size_t ip_out_len, char *mask_out, size_t mask_out_len) {
     // cidr like 10.0.0.1/24
     char tmp[64]; 
     snprintf(tmp, sizeof(tmp), "%s", cidr);
