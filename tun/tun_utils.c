@@ -145,6 +145,26 @@ void cidr_to_addr_mask(const char *cidr, char *ip_out, size_t ip_out_len, char *
     mask_out[mask_out_len - 1] = '\0';
 }
 
+ssize_t tun_read(int fd, void *buf, size_t len) {
+    ssize_t n = read(fd, buf, len);
+    if (n < 0) {
+        if (errno == EINTR) return 0; // interrupted by signal, no error
+        LOG_ERROR("tun_read: %s", strerror(errno));
+        return -1;
+    }
+    return n;
+}
+
+ssize_t tun_write(int fd, const void *buf, size_t len) {
+    ssize_t n = write(fd, buf, len);
+    if (n < 0) {
+        if (errno == EINTR) return 0;
+        LOG_ERROR("tun_write: %s", strerror(errno));
+        return -1;
+    }
+    return n;
+}
+
 int main(int argc, char **argv) {
     if (argc < 3) {
         LOG_ERROR("Usage: %s <ifname> <ip/cidr> [mtu]", argv[0]);
