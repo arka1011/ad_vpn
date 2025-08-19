@@ -1,0 +1,35 @@
+# Build artifacts
+*.o
+*.a
+*.so
+*.dylib
+
+# Executables
+test_tun
+
+# Build directories
+build/
+*/build/
+
+# Object files
+src/*.o
+tests/*.o
+
+# Test executables
+tests/test_*
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
-#include "logger.h"
+#include "../src/logger.h"
 #include <pthread.h>
 
 void* worker_thread(void* arg) {

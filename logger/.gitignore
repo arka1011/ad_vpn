@@ -5,10 +5,8 @@
 *.dylib
 
 # Executables
-linux_client
-linux_server
 logger_example
-test_*
+test_logger
 
 # Build directories
 build/
@@ -17,24 +15,13 @@ build/
 # Log files
 *.log
 app.log
-client.log
-server.log
 
 # Object files
-logger/*.o
-client/*.o
-server/*.o
-crypto/*.o
-tun/*.o
-secure_channel/*.o
+src/*.o
+examples/*.o
+tests/*.o
 
 # Test executables
-logger/tests/test_*
-client/tests/test_*
-server/tests/test_*
-crypto/tests/test_*
-tun/tests/test_*
-secure_channel/tests/test_*
 tests/test_*
 
 # IDE and editor files
@@ -52,7 +39,3 @@ tests/test_*
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-# Temporary files
-*.tmp
-*.temp
