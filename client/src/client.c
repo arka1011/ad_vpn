@@ -1,9 +1,11 @@
+#define _GNU_SOURCE
 #include "client.h"
 #include "../logger/src/logger.h"
 #include "../tun/src/tun_utils.h"
 #include "../secure_channel/src/secure_channel.h"
 #include <stdio.h>
 #include <sys/wait.h>
+#include <linux/if.h>
 #include <net/if.h>
 #include <stdlib.h>
 
@@ -353,7 +355,7 @@ int client_restore_routing(client_ctx_t *c) {
     // Remove default route via TUN
     char cmd[512];
     snprintf(cmd, sizeof(cmd), "ip route del default dev %s 2>/dev/null", c->tun.ifname);
-    system(cmd);
+    (void) system(cmd);
     
     // Restore original default route if we had one
     if (strlen(c->original_gateway) > 0) {
@@ -365,7 +367,7 @@ int client_restore_routing(client_ctx_t *c) {
     
     // Remove VPN subnet route
     snprintf(cmd, sizeof(cmd), "ip route del %s dev %s 2>/dev/null", c->tun_cidr, c->tun.ifname);
-    system(cmd);
+    (void) system(cmd);
     
     return 0;
 }

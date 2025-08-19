@@ -5,6 +5,10 @@
 #include <sys/types.h> // for ssize_t
 #include <net/if.h> // for IFNAMSIZ
 
+#ifndef IFNAMSIZ
+#define IFNAMSIZ IF_NAMESIZE
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

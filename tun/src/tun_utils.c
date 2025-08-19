@@ -19,7 +19,7 @@
 #include <sys/socket.h>
 #include <net/if.h>
 #include <linux/if_tun.h>
-#include "../logger/logger.h"
+#include "../../logger/src/logger.h"
 
 int tun_create(char *ifname, size_t ifname_len) {
     struct ifreq ifr;
