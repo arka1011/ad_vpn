@@ -11,7 +11,7 @@
  */
 
 #include "secure_channel.h"
-#include "logger.h"
+#include "../../logger/src/logger.h"
 
 #include <openssl/evp.h>
 #include <openssl/kdf.h>
@@ -46,7 +46,7 @@ static int sc_aead_decrypt(sc_cipher_t c,
                            uint8_t *pt);
 
 /* Keep hooks global as in skeleton */
-static sc_ctx_priv_t g_ctx = {0};
+static sc_hooks_t g_hooks = {0};
 
 /* utility functions (same as skeleton but fully implemented) */
 
@@ -79,12 +79,12 @@ static uint64_t sc_default_time(void *u) {
 }
 static int sc_get_rng(const secure_chan_t *sc, uint8_t *buf, size_t len) {
     (void)sc;
-    sc_rng_fn rng = g_ctx.hooks.rng ? g_ctx.hooks.rng : sc_default_rng;
-    return rng(g_ctx.hooks.user, buf, len);
+    sc_rng_fn rng = g_hooks.rng ? g_hooks.rng : sc_default_rng;
+    return rng(g_hooks.user, buf, len);
 }
 static uint64_t sc_now(void) {
-    sc_time_fn now = g_ctx.hooks.now ? g_ctx.hooks.now : sc_default_time;
-    return now(g_ctx.hooks.user);
+    sc_time_fn now = g_hooks.now ? g_hooks.now : sc_default_time;
+    return now(g_hooks.user);
 }
 
 /* XOR right-aligned seq into 12B IV base */
@@ -215,7 +215,7 @@ void sc_init(secure_chan_t *sc, sc_cipher_t cipher, const sc_hooks_t *hooks) {
     if (!sc) return;
     memset(sc, 0, sizeof(*sc));
     sc->cipher = cipher ? cipher : SC_CIPHER_CHACHA20_POLY1305;
-    if (hooks) g_ctx.hooks = *hooks;
+    if (hooks) g_hooks = *hooks;
     /* Initialize OpenSSL error strings for easier debugging */
     ERR_load_crypto_strings();
     OpenSSL_add_all_algorithms();
@@ -223,7 +223,7 @@ void sc_init(secure_chan_t *sc, sc_cipher_t cipher, const sc_hooks_t *hooks) {
 
 void sc_set_hooks(secure_chan_t *sc, const sc_hooks_t *hooks) {
     (void)sc;
-    if (hooks) g_ctx.hooks = *hooks;
+    if (hooks) g_hooks = *hooks;
 }
 
 /* control record helpers (same semantics as skeleton) */
@@ -464,20 +464,20 @@ int sc_server_accept(secure_chan_t *sc, int sock_fd, auth_mode_t expected_mode, 
             return SC_ERR_AUTH;
         }
     } else if (expected_mode == AUTH_TOKEN) {
-        if (!g_ctx.hooks.token_verify) {
+        if (!g_hooks.token_verify) {
             LOG_ERROR("sc_server_accept: token_verify hook not set");
             return SC_ERR_AUTH;
         }
-        if (g_ctx.hooks.token_verify(g_ctx.hooks.user, auth_data, expected_psk_or_issuer) != 0) {
+        if (g_hooks.token_verify(g_hooks.user, auth_data, expected_psk_or_issuer) != 0) {
             LOG_ERROR("sc_server_accept: token verify failed");
             return SC_ERR_AUTH;
         }
     } else if (expected_mode == AUTH_MUTUALCERT) {
-        if (!g_ctx.hooks.cert_verify) {
+        if (!g_hooks.cert_verify) {
             LOG_ERROR("sc_server_accept: cert_verify hook not set");
             return SC_ERR_AUTH;
         }
-        if (g_ctx.hooks.cert_verify(g_ctx.hooks.user) != 0) {
+        if (g_hooks.cert_verify(g_hooks.user) != 0) {
             LOG_ERROR("sc_server_accept: cert verify failed");
             return SC_ERR_AUTH;
         }
@@ -738,38 +738,61 @@ done:
     return rc;
 }
 
-/* HKDF expand using OpenSSL HKDF helper
+/* HKDF expand using OpenSSL EVP_PKEY_CTX HKDF APIs
  * out_len <= ~255*hashlen (we only request 88 bytes)
  */
 static int sc_hkdf_expand_openssl(uint8_t *out, size_t out_len,
                                   const uint8_t *salt, size_t salt_len,
                                   const uint8_t *ikm, size_t ikm_len,
                                   const uint8_t *info, size_t info_len) {
-    /* Use HKDF() convenience function (OpenSSL 1.1.1+) */
+    /* Use EVP_PKEY_CTX HKDF APIs (more reliable across OpenSSL versions) */
     const EVP_MD *md = EVP_sha256();
-#if OPENSSL_VERSION_NUMBER >= 0x10101000L
-    if (!HKDF(out, out_len, md, ikm, ikm_len, salt, salt_len, info, info_len)) {
-        LOG_ERROR("sc_hkdf_expand_openssl: HKDF failed");
-        return SC_ERR_CRYPTO;
-    }
-    return 0;
-#else
-    /* Fallback: use EVP_PKEY_CTX HKDF APIs */
     EVP_PKEY_CTX *pctx = EVP_PKEY_CTX_new_id(EVP_PKEY_HKDF, NULL);
-    if (!pctx) { LOG_ERROR("sc_hkdf_expand_openssl: EVP_PKEY_CTX_new_id failed"); return SC_ERR_CRYPTO; }
-    if (EVP_PKEY_derive_init(pctx) <= 0) { EVP_PKEY_CTX_free(pctx); return SC_ERR_CRYPTO; }
-    if (EVP_PKEY_CTX_hkdf_mode(pctx, EVP_PKEY_HKDEF_MODE_EXTRACT_AND_EXPAND) <= 0) { EVP_PKEY_CTX_free(pctx); return SC_ERR_CRYPTO; }
-    if (EVP_PKEY_CTX_set_hkdf_md(pctx, md) <= 0) { EVP_PKEY_CTX_free(pctx); return SC_ERR_CRYPTO; }
-    if (EVP_PKEY_CTX_set1_hkdf_salt(pctx, salt, (int)salt_len) <= 0) { EVP_PKEY_CTX_free(pctx); return SC_ERR_CRYPTO; }
-    if (EVP_PKEY_CTX_set1_hkdf_key(pctx, ikm, (int)ikm_len) <= 0) { EVP_PKEY_CTX_free(pctx); return SC_ERR_CRYPTO; }
-    if (info && info_len) {
-        if (EVP_PKEY_CTX_add1_hkdf_info(pctx, info, (int)info_len) <= 0) { EVP_PKEY_CTX_free(pctx); return SC_ERR_CRYPTO; }
+    if (!pctx) { 
+        LOG_ERROR("sc_hkdf_expand_openssl: EVP_PKEY_CTX_new_id failed"); 
+        return SC_ERR_CRYPTO; 
     }
+    
+    if (EVP_PKEY_derive_init(pctx) <= 0) { 
+        EVP_PKEY_CTX_free(pctx); 
+        return SC_ERR_CRYPTO; 
+    }
+    
+    if (EVP_PKEY_CTX_hkdf_mode(pctx, EVP_PKEY_HKDEF_MODE_EXTRACT_AND_EXPAND) <= 0) { 
+        EVP_PKEY_CTX_free(pctx); 
+        return SC_ERR_CRYPTO; 
+    }
+    
+    if (EVP_PKEY_CTX_set_hkdf_md(pctx, md) <= 0) { 
+        EVP_PKEY_CTX_free(pctx); 
+        return SC_ERR_CRYPTO; 
+    }
+    
+    if (EVP_PKEY_CTX_set1_hkdf_salt(pctx, salt, (int)salt_len) <= 0) { 
+        EVP_PKEY_CTX_free(pctx); 
+        return SC_ERR_CRYPTO; 
+    }
+    
+    if (EVP_PKEY_CTX_set1_hkdf_key(pctx, ikm, (int)ikm_len) <= 0) { 
+        EVP_PKEY_CTX_free(pctx); 
+        return SC_ERR_CRYPTO; 
+    }
+    
+    if (info && info_len) {
+        if (EVP_PKEY_CTX_add1_hkdf_info(pctx, info, (int)info_len) <= 0) { 
+            EVP_PKEY_CTX_free(pctx); 
+            return SC_ERR_CRYPTO; 
+        }
+    }
+    
     size_t olen = out_len;
-    if (EVP_PKEY_derive(pctx, out, &olen) <= 0) { EVP_PKEY_CTX_free(pctx); return SC_ERR_CRYPTO; }
+    if (EVP_PKEY_derive(pctx, out, &olen) <= 0) { 
+        EVP_PKEY_CTX_free(pctx); 
+        return SC_ERR_CRYPTO; 
+    }
+    
     EVP_PKEY_CTX_free(pctx);
     return 0;
-#endif
 }
 
 /* AEAD encryption using OpenSSL EVP interfaces

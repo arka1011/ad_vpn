@@ -8,8 +8,8 @@
 #include <getopt.h>
 
 // Include our modules
-#include "../../server/server.h"
-#include "../../logger/logger.h"
+#include "../../server/src/server.h"
+#include "../../logger/src/logger.h"
 
 // Configuration structure
 typedef struct {

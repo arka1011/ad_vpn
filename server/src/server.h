@@ -16,8 +16,8 @@
 #include <time.h>
 
 // Include the required headers for type definitions
-#include "../tun/tun_utils.h"
-#include "../secure_channel/secure_channel.h"
+#include "../tun/src/tun_utils.h"
+#include "../secure_channel/src/secure_channel.h"
 
 // Server context structure
 typedef struct {

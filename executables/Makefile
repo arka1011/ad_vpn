@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -g -O2
-INCLUDES = -I../logger -I../tun -I../secure_channel -I../crypto -I../client -I../server
+INCLUDES = -I../logger -I../tun -I../crypto -I../secure_channel -I../client -I../server
 LDFLAGS = -lpthread -ldl
 
 # Build directories
@@ -27,6 +27,7 @@ SERVER_LIB = $(BUILD_LIB)/libserver.so
 
 # Default target
 all: $(CLIENT_EXEC) $(SERVER_EXEC)
+	$(MAKE) -C tests
 
 # Create build directories
 $(BUILD_LIB):
@@ -61,9 +62,10 @@ install: $(CLIENT_EXEC) $(SERVER_EXEC)
 uninstall:
 	rm -f /usr/local/bin/vpn_client /usr/local/bin/vpn_server
 
-# Clean
+# Clean - only remove executable-specific files
 clean:
 	rm -f $(CLIENT_EXEC) $(SERVER_EXEC)
+	$(MAKE) -C tests clean
 
 # Dependencies
 $(CLIENT_EXEC): $(CLIENT_LIB) $(LOGGER_LIB) $(TUN_LIB) $(SECURE_CHANNEL_LIB) $(CRYPTO_LIB)

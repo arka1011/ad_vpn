@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <strings.h>
 #include <unistd.h>
 #include <signal.h>
 #include <sys/stat.h>
@@ -8,8 +8,8 @@
 #include <getopt.h>
 
 // Include our modules
-#include "../../client/client.h"
-#include "../../logger/logger.h"
+#include "../../client/src/client.h"
+#include "../../logger/src/logger.h"
 
 // Configuration structure
 typedef struct {

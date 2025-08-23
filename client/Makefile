@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -g -O2 -fPIC
-INCLUDES = -I. -I../logger -I../tun -I../secure_channel -I../crypto
+INCLUDES = -I. -I../logger -I../tun -I../crypto -I../secure_channel
 LDFLAGS = -lpthread -ldl
 
 # Source files
@@ -35,6 +35,7 @@ TEST_EXEC = $(BUILD_BIN)/test_client
 
 # Default target
 all: $(CLIENT_LIB_STATIC) $(CLIENT_LIB_SHARED) $(LOCAL_CLIENT_LIB_STATIC) $(LOCAL_CLIENT_LIB_SHARED)
+#	$(MAKE) -C tests
 
 # Create build directories
 $(BUILD_LIB):
@@ -91,10 +92,12 @@ install: $(CLIENT_LIB_SHARED)
 uninstall:
 	rm -f /usr/local/lib/$(CLIENT_LIB_SHARED) /usr/local/include/client.h
 
-# Clean
+# Clean - only remove client-specific files
 clean:
 	rm -f $(CLIENT_OBJ) $(CLIENT_LIB_STATIC) $(CLIENT_LIB_SHARED) $(TEST_EXEC)
-	rm -rf $(BUILD_DIR) build/
+	rm -f $(LOCAL_CLIENT_LIB_STATIC) $(LOCAL_CLIENT_LIB_SHARED)
+	rm -rf build/
+	$(MAKE) -C tests clean
 
 # Dependencies
 $(CLIENT_LIB_SHARED): $(LOGGER_LIB) $(TUN_LIB) $(SECURE_CHANNEL_LIB) $(CRYPTO_LIB)

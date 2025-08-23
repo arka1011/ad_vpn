@@ -27,6 +27,7 @@ linux-only:
 	@echo "Building Linux-specific modules..."
 ifeq ($(PLATFORM),linux)
 	$(MAKE) -C tun
+	$(MAKE) -C crypto
 	$(MAKE) -C secure_channel
 	$(MAKE) -C client
 	$(MAKE) -C server
@@ -42,19 +43,19 @@ else
 	@echo "TUN module requires Linux - skipping on $(PLATFORM)"
 endif
 
-secure_channel:
-ifeq ($(PLATFORM),linux)
-	$(MAKE) -C secure_channel
-else
-	@echo "Secure channel module requires Linux - skipping on $(PLATFORM)"
-endif
-
 crypto:
 ifeq ($(PLATFORM),linux)
 	$(MAKE) -C crypto
 else
 	@echo "Crypto module requires OpenSSL - skipping on $(PLATFORM)"
 	@echo "Use 'brew install openssl' to install OpenSSL on macOS"
+endif
+
+secure_channel:
+ifeq ($(PLATFORM),linux)
+	$(MAKE) -C secure_channel
+else
+	@echo "Secure channel module requires Linux - skipping on $(PLATFORM)"
 endif
 
 client:
@@ -81,7 +82,7 @@ else
 	@echo "Executables require Linux - skipping on $(PLATFORM)"
 endif
 
-# Clean all modules
+# Clean all modules - now more selective
 clean:
 	$(MAKE) -C logger clean
 ifeq ($(PLATFORM),linux)
@@ -93,7 +94,7 @@ ifeq ($(PLATFORM),linux)
 	$(MAKE) -C crypto clean
 endif
 	$(MAKE) -C tests clean
-	rm -rf build/
+	@echo "Note: build/ directory is preserved to keep other module libraries"
 
 # Install all modules
 install:

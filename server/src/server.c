@@ -1,10 +1,12 @@
 #include "server.h"
-#include "../logger/logger.h"
-#include "../tun/tun_utils.h"
-#include "../secure_channel/secure_channel.h"
+#include "../logger/src/logger.h"
+#include "../tun/src/tun_utils.h"
+#include "../secure_channel/src/secure_channel.h"
 #include <stdio.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <linux/if.h>
+#include <net/if.h>
 
 // Default server parameters
 #define DEFAULT_BACKLOG 5

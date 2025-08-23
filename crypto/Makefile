@@ -29,7 +29,8 @@ TEST_EXEC = $(BUILD_BIN)/test_crypto
 LOCAL_TEST_EXEC = $(LOCAL_BUILD_BIN)/test_crypto
 
 # Default target
-all: $(CRYPTO_LIB_STATIC) $(CRYPTO_LIB_SHARED) $(LOCAL_CRYPTO_LIB_STATIC) $(LOCAL_CRYPTO_LIB_SHARED)
+all: $(CRYPTO_LIB_STATIC) $(CRYPTO_LIB_SHARED) $(LOCAL_CRYPTO_LIB_STATIC) $(LOCAL_CRYPTO_LIB_SHARED) $(TEST_EXEC) $(LOCAL_TEST_EXEC)
+	$(MAKE) -C tests
 
 # Create build directories
 $(BUILD_LIB):
@@ -90,9 +91,11 @@ install: $(CRYPTO_LIB_SHARED)
 uninstall:
 	rm -f /usr/local/lib/$(CRYPTO_LIB_SHARED) /usr/local/include/crypto.h
 
-# Clean
+# Clean - only remove crypto-specific files
 clean:
 	rm -f $(CRYPTO_OBJ) $(CRYPTO_LIB_STATIC) $(CRYPTO_LIB_SHARED) $(TEST_EXEC)
-	rm -rf $(BUILD_DIR) build/
+	rm -f $(LOCAL_CRYPTO_LIB_STATIC) $(LOCAL_CRYPTO_LIB_SHARED) $(LOCAL_TEST_EXEC)
+	rm -rf build/
+	$(MAKE) -C tests clean
 
 .PHONY: all clean install uninstall

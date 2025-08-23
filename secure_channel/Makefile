@@ -27,6 +27,7 @@ LOCAL_SHARED_LIB = $(LOCAL_BUILD_LIB)/libsecure_channel.so
 
 # Default target
 all: $(STATIC_LIB) $(SHARED_LIB) $(LOCAL_STATIC_LIB) $(LOCAL_SHARED_LIB)
+	$(MAKE) -C tests
 
 # Create build directories
 $(BUILD_LIB):
@@ -67,9 +68,11 @@ $(LOCAL_STATIC_LIB): $(OBJ) | $(LOCAL_BUILD_LIB)
 $(LOCAL_SHARED_LIB): $(OBJ) | $(LOCAL_BUILD_LIB)
 	$(CC) -shared -o $@ $(OBJ) $(LIBS)
 
-# Clean
+# Clean - only remove secure_channel-specific files
 clean:
-	rm -rf $(BUILD_DIR) build/ *.o
+	rm -f $(OBJ) $(STATIC_LIB) $(SHARED_LIB) $(LOCAL_STATIC_LIB) $(LOCAL_SHARED_LIB)
+	rm -rf build/
+	$(MAKE) -C tests clean
 
 # Install (optional)
 install: all

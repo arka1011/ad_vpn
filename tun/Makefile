@@ -23,6 +23,7 @@ LOCAL_LIB_STATIC = $(LOCAL_BUILD_LIB)/libtun_utils.a
 LOCAL_LIB_SHARED = $(LOCAL_BUILD_LIB)/libtun_utils.so
 
 all: $(LIB_STATIC) $(LIB_SHARED) $(LOCAL_LIB_STATIC) $(LOCAL_LIB_SHARED)
+	$(MAKE) -C tests
 
 # Create build directories
 $(BUILD_LIB):
@@ -59,15 +60,18 @@ $(LOCAL_LIB_SHARED): $(OBJ) | $(LOCAL_BUILD_LIB)
 	$(CC) -shared -o $@ $^
 
 clean:
-	rm -f $(OBJ) $(LIB_STATIC) $(LIB_SHARED)
-	rm -rf $(BUILD_DIR) build/
+	rm -f $(OBJ) $(LIB_STATIC) $(LIB_SHARED) $(LOCAL_LIB_STATIC) $(LOCAL_LIB_SHARED)
+	rm -rf build/
+	$(MAKE) -C tests clean
 
 install: $(LIB_SHARED)
 	install -d /usr/local/lib /usr/local/include
 	install -m 755 $(LIB_SHARED) /usr/local/lib/
-	install -m 644 tun_utils.h /usr/local/include/
+	install -m 644 src/tun_utils.h /usr/local/include/
 	@echo "Running ldconfig to update shared library cache (requires root)..."
 	@sudo ldconfig
 
 uninstall:
 	rm -f /usr/local/lib/libtun_utils.so /usr/local/include/tun_utils.h
+
+.PHONY: all clean install uninstall

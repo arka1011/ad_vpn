@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -g -O2
-INCLUDES = -I.. -I../../logger -I../../tun
+INCLUDES = -I.. -I../../logger/build -I../../tun/build
 LDFLAGS = -lpthread
 
 # Test executable
