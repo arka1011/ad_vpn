@@ -1,0 +1,83 @@
+# -----------------------------
+# Build Artifacts
+# -----------------------------
+build/
+build-*/
+out/
+bin/
+lib/
+*.o
+*.a
+*.so
+*.so.*
+*.dll
+*.dylib
+*.exe
+
+# CMake files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
+*.cmake.in
+Makefile
+
+# Ninja
+.ninja_deps
+.ninja_log
+
+# -----------------------------
+# IDE / Editor
+# -----------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*.user
+*.workspace
+*.project
+
+# clangd / compile_commands
+compile_commands.json
+.clangd/
+.cache/
+
+# -----------------------------
+# Logs & Runtime Dumps
+# -----------------------------
+*.log
+*.log.*
+logs/
+core
+core.*
+
+# -----------------------------
+# OS & Misc
+# -----------------------------
+.DS_Store
+Thumbs.db
+*.tmp
+
+# -----------------------------
+# Prebuilt libs (but NOT the actual .so/.a you added)
+# Ignore builds inside prebuilt but keep static assets
+# -----------------------------
+prebuilt/**/build/
+prebuilt/**/.cache/
+
+# -----------------------------
+# Submodule Internal Builds
+# (modules each have their own build dirs)
+# -----------------------------
+modules/**/build/
+modules/**/CMakeFiles/
+modules/**/CMakeCache.txt
+modules/**/Makefile
+
+# -----------------------------
+# Test Outputs
+# -----------------------------
+tests/**/out/
+tests/**/build/
+tests/**/test-results/
