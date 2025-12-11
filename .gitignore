@@ -63,7 +63,7 @@ Thumbs.db
 # Prebuilt libs (but NOT the actual .so/.a you added)
 # Ignore builds inside prebuilt but keep static assets
 # -----------------------------
-prebuilt/**/build/
+# prebuilt/**/build/
 prebuilt/**/.cache/
 
 # -----------------------------
