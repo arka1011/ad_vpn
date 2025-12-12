@@ -1,0 +1,8 @@
+[submodule "modules/ad_logger"]
+	path = modules/ad_logger
+	url = https://github.com/arka1011/ad_logger.git
+	branch = master
+[submodule "modules/ad_tun"]
+	path = modules/ad_tun
+	url = https://github.com/arka1011/ad_tun.git
+	branch = ad_vpn
