@@ -6,3 +6,7 @@
 	path = modules/ad_tun
 	url = https://github.com/arka1011/ad_tun.git
 	branch = ad_vpn
+[submodule "modules/ad_transport"]
+	path = modules/ad_transport
+	url = https://github.com/arka1011/ad_transport.git
+	branch = master
