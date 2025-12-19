@@ -14,6 +14,10 @@ lib/
 *.dylib
 *.exe
 
+# Exclude prebuilt/libsodium/lib from the ignore
+!prebuilt/libsodium/lib/
+!prebuilt/libsodium/lib/*.so
+
 # CMake files
 CMakeFiles/
 CMakeCache.txt
