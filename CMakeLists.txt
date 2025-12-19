@@ -16,6 +16,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 # Order matters because of target dependencies
 add_subdirectory(modules/ad_logger)
 add_subdirectory(modules/ad_tun)
+add_subdirectory(modules/ad_crypt)
 add_subdirectory(modules/ad_transport)
 
 # ---- AD_VPN EXECUTABLE ----
@@ -28,6 +29,7 @@ target_include_directories(ad_vpn PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     modules/ad_logger/include
     modules/ad_tun/include
+    modules/ad_crypt/include
     modules/ad_transport/include
 )
 
@@ -35,6 +37,7 @@ target_include_directories(ad_vpn PRIVATE
 target_link_libraries(ad_vpn
     ad_transport
     ad_tun
+    ad_crypt
     ad_logger
 )
 

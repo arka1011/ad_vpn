@@ -10,3 +10,7 @@
 	path = modules/ad_transport
 	url = https://github.com/arka1011/ad_transport.git
 	branch = master
+[submodule "modules/ad_crypt"]
+	path = modules/ad_crypt
+	url = https://github.com/arka1011/ad_crypt.git
+	branch = master
