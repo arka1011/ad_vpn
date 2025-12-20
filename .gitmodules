@@ -14,3 +14,11 @@
 	path = modules/ad_crypt
 	url = https://github.com/arka1011/ad_crypt.git
 	branch = master
+[submodule "modules/ad_kex"]
+	path = modules/ad_kex
+	url = https://github.com/arka1011/ad_kex.git
+	branch = master
+[submodule "modules/ad_auth"]
+	path = modules/ad_auth
+	url = https://github.com/arka1011/ad_auth.git
+	branch = master
