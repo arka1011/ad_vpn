@@ -22,3 +22,7 @@
 	path = modules/ad_auth
 	url = https://github.com/arka1011/ad_auth.git
 	branch = master
+[submodule "modules/ad_routing"]
+	path = modules/ad_routing
+	url = https://github.com/arka1011/ad_routing.git
+	branch = master

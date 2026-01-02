@@ -20,6 +20,7 @@ add_subdirectory(modules/ad_auth)
 add_subdirectory(modules/ad_kex)
 add_subdirectory(modules/ad_crypt)
 add_subdirectory(modules/ad_transport)
+add_subdirectory(modules/ad_routing)
 
 # ---- AD_VPN EXECUTABLE ----
 add_executable(ad_vpn
@@ -35,6 +36,7 @@ target_include_directories(ad_vpn PRIVATE
     modules/ad_auth/include
     modules/ad_crypt/include
     modules/ad_transport/include
+    modules/ad_routing/include
 )
 
 # ---- LINK MODULE LIBRARIES ----
@@ -45,6 +47,13 @@ target_link_libraries(ad_vpn
     ad_kex
     ad_crypt
     ad_logger
+    ad_routing
 )
 
+# ---- TESTS ----
 enable_testing()
+option(BUILD_TESTS "Build unit tests" ON)
+
+if(BUILD_TESTS)
+    add_subdirectory(tests)
+endif()

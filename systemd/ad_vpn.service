@@ -1,0 +1,40 @@
+[Unit]
+Description=AD VPN Service
+Documentation=man:ad_vpn(8)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/ad_vpn
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=30s
+
+# Security settings
+User=root
+Group=root
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW
+NoNewPrivileges=true
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Environment variables
+Environment="AD_VPN_CONFIG=/etc/ad_vpn/ad_vpn_config.ini"
+Environment="AD_VPN_LOGGER_CONFIG=/etc/ad_vpn/ad_zlog_config.conf"
+
+# Working directory
+WorkingDirectory=/var/lib/ad_vpn
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ad_vpn
+
+[Install]
+WantedBy=multi-user.target
+
