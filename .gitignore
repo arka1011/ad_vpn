@@ -17,6 +17,7 @@ lib/
 # Exclude prebuilt/libsodium/lib from the ignore
 !prebuilt/libsodium/lib/
 !prebuilt/libsodium/lib/*.so
+!prebuilt/libsodium/include/core.h
 
 # CMake files
 CMakeFiles/
